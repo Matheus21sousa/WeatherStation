@@ -55,7 +55,7 @@ uint32_t delayMS;
 
 // Definições de variáveis //
 int b = 0; // Nº de basculadas //
-float v = 1; // Volume da basculada //
+float v = 1; // Volume da basculada - Deve ser calibrado//
 int side = 0;
 // lado = 0 - Início //
 // lado = 1 - Esquerda //
@@ -71,8 +71,8 @@ void setup() {
 
   // RTC - Permite testar se está funcionando //
   if (! rtc.begin()) { 
-    Serial.println("DS3231 não encontrado"); //IMPRIME O TEXTO NO MONITOR SERIAL
-    while (1); //SEMPRE ENTRE NO LOOP
+    Serial.println("DS3231 não encontrado"); // Imprime, em caso de erro
+    while (1); // Fica em loop
   }
   if (rtc.lostPower()) { //Para inicializar o RTC pela primeira vez, utilize um dos dois códigos abaixo: //
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Captura do computador as informações de data e hora //
@@ -91,7 +91,6 @@ void loop() {
 void bascula() {
   if (comutarB) {
     // Início // Para lado == 0 //
-    //
     if (!digitalRead(ampolad) && side == 0) {
       b++;
       side++;
@@ -102,7 +101,6 @@ void bascula() {
       side++;
     }
     // Execução // Para lado != 0 //
-    //
     else if (!digitalRead(ampolad) && side == 1) {
       b++;
       side++;
@@ -111,6 +109,7 @@ void bascula() {
       b++;
       side--;
     }
+    // Comuta a atividade 01 //
     tempoB = millis();
     comutarB = false;
   }
@@ -164,7 +163,7 @@ void dados() {
     Serial.print(','); 
     Serial.println();
 
-    // Comuta atividade 2 //
+    // Comuta atividade 02 //
     tempoD = millis();
     comutarD = false;
   }
