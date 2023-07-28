@@ -6,28 +6,43 @@
 //
 
 // Bibliotecas utilizadas //
+#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-#include <Wire.h>
+#include "DFRobot_SHT20.h"
 #include "RTClib.h"
+#include <SD.h>
+#include <SPI.h>
 
 // Define a pinagem de conexão com o arduíno;
+#define ampolae 2
+#define ampolad 4
+#define chipSelect 5
 #define DHTPIN 7
-#define ampolad 2
-#define ampolae 4
 #define DHTTYPE DHT11
 //#define DHTTYPE DHT22 (AM2302)
 //#define DHTTYPE DHT21 (AM2301)
 
 // Descrição das portas //
-// DHT = Porta 07
-// RTC = Portas I²C
+// RTC:
 //       SCL = Porta 01 I²C
 //       SDA = Porta 02 I²C
+// SHT:
+//       SCL = Porta A5 I²C (Amarelo)
+//       SDA = Porta A4 I²C (Verde)
+// Leitor SD:
+//       CS = Porta 05
+//       SCK = Porta 13
+//       MOSI = Porta 11
+//       MISO = Porta 12
+// 
 
 // Inicializa o RTC //
 RTC_DS3231 rtc;
+
+// Inicializa o SHT //
+DFRobot_SHT20 sht20(&Wire, SHT20_I2C_ADDR);
 
 // Define [nº de dias da semana] [nº de meses do ano] e nome dos dias da semana //
 char daysOfTheWeek[7][12] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"};
@@ -43,7 +58,6 @@ unsigned long tempoD = 0;
 // Comutando as funções //
 bool comutarB = false;
 bool comutarD = false;
-
 // ComutarB = Função da báscula //
 // ComutarD = Função de imprimir dados //
 
@@ -71,12 +85,23 @@ void setup() {
 
   // RTC - Permite testar se está funcionando //
   if (! rtc.begin()) { 
-    Serial.println("DS3231 não encontrado"); // Imprime, em caso de erro
+    Serial.println("RTC não encontrado"); // Imprime, em caso de erro
     while (1); // Fica em loop
   }
   if (rtc.lostPower()) { //Para inicializar o RTC pela primeira vez, utilize um dos dois códigos abaixo: //
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Captura do computador as informações de data e hora //
-    // rtc.adjust(DateTime(2018, 9, 29, 15, 00, 45)); // Inserir manualmente [ano, mês, dia, hora, minutos, segundos] //
+    // rtc.adjust(DateTime(2023, 7, 27, 23, 50, 00)); // Inserir manualmente [ano, mês, dia, hora, minutos, segundos] //
+  }
+
+  // SHT - Inicia o sensor
+  sht20.initSHT20();
+  sht20.checkSHT20();
+
+  // Leitor SD - Permite testar se está funcionando //
+  if (!SD.begin(chipSelect)){
+    Serial.print("Error to acess the card!");
+    Serial.print("Verify your card/conections and reset");
+    return;
   }
 }
 
@@ -118,6 +143,8 @@ void bascula() {
 // Atividade 02 - Lê DHT e imprime: Data, Hora, Umidade, Pluviosidade //
 void dados() {
   if (comutarD) {
+
+    // Chama a função do RTC //
     DateTime now = rtc.now(); // Chama função do RTC
     Serial.print("Data: "); 
     Serial.print(now.day(), DEC); 
@@ -126,7 +153,7 @@ void dados() {
     Serial.print('/'); 
     Serial.print(now.year(), DEC); 
     Serial.print(',');    
-    Serial.print(" Horas: "); 
+    Serial.print(" Hora: "); 
     Serial.print(now.hour(), DEC); 
     Serial.print(':'); 
     Serial.print(now.minute(), DEC);
@@ -134,34 +161,91 @@ void dados() {
     Serial.print(now.second(), DEC); 
     Serial.print(','); 
 
+    // Chama a função do DHT //
     sensors_event_t event;
-    dht.temperature().getEvent(&event);
+    dht.temperature().getEvent(&event); // Lê temperatura do ar
     if (isnan(event.temperature)) {
       Serial.print(F("Erro ao ler a temperatura!"));
     }
     else {
-      Serial.print(F(" Temperatura: "));
+      Serial.print(F(" Temp. do Ar: "));
       Serial.print(event.temperature);
       Serial.print(F("°C"));
       Serial.print(','); 
     }
-
-    dht.humidity().getEvent(&event);
+    dht.humidity().getEvent(&event); // Lê umidade do ar
     if (isnan(event.relative_humidity)) {
       Serial.print(F("Erro ao ler a umidade!"));
     }
     else {
-      Serial.print(F(" Umidade: "));
+      Serial.print(F(" Umidade do Ar: "));
       Serial.print(event.relative_humidity);
       Serial.print(F("%"));
       Serial.print(','); 
     }
+
+    // Chama o SHT 
+    float soilHum = sht20.readHumidity();
+    float soilTem = sht20.readTemperature();
+    Serial.print(F(" Temp. do solo: ")); Serial.print(soilTem); Serial.print(F("°C,"));
+    Serial.print(F(" Umidade do solo: ")); Serial.print(soilHum); Serial.print(F("%,"));
 
     // Imprime variável chuva //
     float chuva = b * v;
     Serial.print(F(" Chuva atual: ")); Serial.print(chuva); Serial.print(F(" mm"));
     Serial.print(','); 
     Serial.println();
+
+    // Gravação de dados no SD //
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);
+    if (dataFile){
+      // Grava: Data e horário//
+      dataFile.print("Data: "); 
+      dataFile.print(now.day(), DEC); 
+      dataFile.print('/'); 
+      dataFile.print(now.month(), DEC); 
+      dataFile.print('/'); 
+      dataFile.print(now.year(), DEC); 
+      dataFile.print(',');    
+      dataFile.print(" Hora: "); 
+      dataFile.print(now.hour(), DEC); 
+      dataFile.print(':'); 
+      dataFile.print(now.minute(), DEC);
+      dataFile.print(':'); 
+      dataFile.print(now.second(), DEC); 
+      dataFile.print(',');
+
+      // Grava: Temperatura do Ar //
+      dht.temperature().getEvent(&event);
+      if (isnan(event.temperature)) {
+        dataFile.print(F("Erro ao ler a temperatura!"));
+      }
+      else {
+        dataFile.print(F(" Temp. do ar: ")); dataFile.print(event.temperature); dataFile.print(F("°C,"));
+      }
+
+      // Grava: Umidade do Ar //
+      dht.humidity().getEvent(&event);
+      if (isnan(event.relative_humidity)) {
+        dataFile.print(F("Erro ao ler a umidade!"));
+      }
+      else {
+        dataFile.print(F(" Umidade do ar: ")); dataFile.print(event.relative_humidity); dataFile.print(F("%,"));
+      }
+
+      // Grava: Temperatura do Solo //
+      dataFile.print(F(" Temp. do solo: ")); dataFile.print(soilTem); dataFile.print(F("°C,"));
+
+      // Grava: Umidade do Solo //
+      dataFile.print(F(" Umidade do solo: ")); dataFile.print(soilHum); dataFile.print(F("%,"));
+
+      // Grava: Pluviometria //
+      dataFile.print(F(" Chuva atual: ")); dataFile.print(chuva); dataFile.print(F(" mm,"));
+      dataFile.println();
+
+      //Fecha o arquivo
+      dataFile.close();
+    }
 
     // Comuta atividade 02 //
     tempoD = millis();
