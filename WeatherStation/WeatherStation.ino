@@ -1,11 +1,11 @@
-// MADE BY: Matheus Martins de Sousa //
-//
-// O presente projeto é aberto a correções
-// Use com sabedoria!
-// :)
-//
+/* ESTAÇÃO METEOROLÓGICA
+    By: Matheus M. Sousa 
+    O presente projeto é aberto a correções
+    Use com sabedoria!
+    :)
+*/ 
 
-// Bibliotecas utilizadas //
+// BIBLIOTECAS UTILIZADAS
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -15,7 +15,7 @@
 #include <SD.h>
 #include <SPI.h>
 
-// Define a pinagem de conexão com o arduíno;
+// DEFINIÇÃO DE PORTAS
 #define ampolae 2
 #define ampolad 4
 #define chipSelect 5
@@ -36,7 +36,6 @@
 //       SCK = Porta 13
 //       MOSI = Porta 11
 //       MISO = Porta 12
-// 
 
 // Inicializa o RTC //
 RTC_DS3231 rtc;
@@ -67,13 +66,13 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 // Variável de delay //
 uint32_t delayMS;
 
-// Definições de variáveis //
-int b = 0; // Nº de basculadas //
-float v = 1; // Volume da basculada - Deve ser calibrado//
+// VARIÁVEIS UTILIZADAS 
+int b = 0;        // Nº de basculadas 
+float v = 1;      // Volume da basculada - Deve ser calibrado
 int side = 0;
-// lado = 0 - Início //
-// lado = 1 - Esquerda //
-// lado = 2 - Direita //
+// lado = 0 - Início 
+// lado = 1 - Esquerda 
+// lado = 2 - Direita 
 
 void setup() {
   pinMode(ampolae, INPUT_PULLUP); //Define pino de entrada
