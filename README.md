@@ -10,6 +10,22 @@
 
 ---
 
+**COMPONENTES ELETRÔNICOS:**
+
+Como microcontrolador, pode ser utilizado qualquer dispositivo ***Arduino*** ou ***ESP***.
+
+Abaixo, estão listados todos os componentes eletrônicos adicionais:
+
+| *NOME*                      | *QUANTIDADE*    | *FUNÇÃO*                               |
+| :---                        | :---:           | :---                                   | 
+| **DHTxx**                   | 01              | Umidade e temperatura do ar            |
+| **SHT20**                   | 01              | Umidade e temperatura do solo          |
+| **Hall 49e**                | 02              | Determina o número de basculadas       |
+| **RTC - DS3231**            | 01              | Armazena informações de data e hora    |
+| **Módulo micro SD - 4MD36** | 01              | Grava informações em cartão micro SD   |
+
+---
+
 **INSTRUÇÕES PARA IMPRESSÃO DAS PEÇAS:**
 
 - **Abrigo meteorológico:**
