@@ -1,8 +1,8 @@
 # PROJETO -> Estação meteorológica de baixo custo!
 
-> **Starter:** *Matheus M. Sousa*
+> **Strater:** *Matheus M. Sousa*
 >
-> **Contribuitors:** *Marcos Paulo L. Resende*; *André Luiz V. Silva*; *Juvenal Caetano de Barcelos*; *Júlio César Neves dos Santos*
+> **Contributors:** *Marcos Paulo L. Resende*; *André Luiz V. Silva*; *Juvenal Caetano de Barcelos*; *Júlio César Neves dos Santos*
 >
 > O presente repositório, visa documentar a trajetória por trás da elaboração de uma estação meteorológica com base em Arduíno e peças impressas.
 >
@@ -33,13 +33,13 @@ Abaixo, estão listados todos os componentes eletrônicos adicionais:
   2. *Peça B:* Peças intermediárias (mínimo 4);
   3. *Peça C:* Topo;
   4. *Espaçador:* Peças de 1 cm de altura para limitar a distância de encaixe entre as peças anteriores;
-- **Báscula e base:**
-  - Imprimir a peça com altura entre camadas inferior á 0,2 mm;
+- **Báscula:**
+  - Imprimir a peça com altura entre camadas igual ou inferior á 0,2 mm;
   - Reduzir a rugosidade dos compartimentos com o uso de uma lixa d'água;
-  - A columetria dos compartimentos deve ser estimada por meio de testes laboratoriais;  
+  - A volumetria dos compartimentos deve ser estimada por meio de testes laboratoriais;  
 - **Funil:**
   - Fundir as peças (*Funil externo* + *Funil interno* + *Funil interno - suporte*) c/ cola *super bonder*;
-  - Aferir que o orifício do funil interno não esteja obstruído após impressão; 
+  - Verificar se orifício do funil interno não esteja obstruído após impressão; 
 
 ---
 
