@@ -11,12 +11,18 @@
 #include <DHT_U.h>
 
 // Define o pino de conexão com o arduíno; 
-#define DHTPIN 7
+#define DHTPIN 50
 
 // Selecione a seguir o sensor que está sendo utilizado, retirando as // no início da linha:
 #define DHTTYPE    DHT11     // DHT 11
 //#define DHTTYPE    DHT22     // DHT 22 (AM2302)
 //#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+// Definição de variáveis
+float temp_lida = 0; 
+float temp_real = 0;
+float umi_lida = 0;
+float umi_real = 0;
 
 // Configuração do sensor DHT - pinagem e tipagem //
 DHT_Unified dht(DHTPIN, DHTTYPE);
@@ -63,23 +69,24 @@ void loop() {
   delay(delayMS);
   // Realiza a leitura da temperatura e "printa" o valor //
   sensors_event_t event;
+
+  // TEMPERATURA
   dht.temperature().getEvent(&event);
-  if (isnan(event.temperature)) {
-    Serial.println(F("Erro ao ler a temperatura!"));
-  }
-  else {
-    Serial.print(F("Temperatura: "));
-    Serial.print(event.temperature);
-    Serial.println(F("°C"));
-  }
-  // Realiza a leitura da umidade e "printa" o valor //
-  dht.humidity().getEvent(&event);
-  if (isnan(event.relative_humidity)) {
-    Serial.println(F("Erro ao ler a umidade!"));
-  }
-  else {
-    Serial.print(F("Humidade: "));
-    Serial.print(event.relative_humidity);
-    Serial.println(F("%"));
-  }
+  temp_lida = event.temperature; 
+  temp_real = temp_lida - 0.5; 
+  Serial.print(F("Temperatura: "));
+  Serial.print(temp_lida);
+  Serial.print(F(" // "));
+  Serial.print(temp_real);
+  Serial.print(F("°C; "));
+
+  // UMIDADE
+  dht.humidity().getEvent(&event); 
+  umi_lida = event.relative_humidity; 
+  umi_real = temp_lida * 1.2; 
+  Serial.print(F("Umidade real // lida: "));
+  Serial.print(umi_lida);
+  Serial.print(F(" // "));
+  Serial.print(temp_real);
+  Serial.println(F("%"));
 }
